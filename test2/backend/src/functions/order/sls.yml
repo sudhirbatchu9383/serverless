@@ -1,0 +1,88 @@
+
+provider:
+  name: aws
+  runtime: python3.6
+  versionFunctions: false
+  stage: dev
+  
+functions:
+  OrderShipping:
+    name: DVSA-ORDER-SHIPPING
+    handler: backend/src/functions/order/order_shipping.lambda_handler
+    role: dvsaOrderRole
+    environment:
+      ORDERS_TABLE: DVSA-ORDERS-DB
+    timeout: 10
+    memorySize: 128
+    package: 
+      include: 
+        - backend/src/functions/order/order_shipping.py
+  OrderBilling:
+    name: DVSA-ORDER-BILLING
+    handler: backend/src/functions/order/order_billing.lambda_handler
+    role: dvsaOrderRole
+    environment:
+      ORDERS_TABLE: DVSA-ORDERS-DB
+      GET_CART_TOTAL: { "Fn::Join" : ["", [ "https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.", {Ref: 'AWS::Region'}, ".amazonaws.com/${self:custom.stage}/DVSA-GET-CART-TOTAL"]]}
+      PAYMENT_PROCESS_URL: { "Fn::Join" : ["", [ "https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.", {Ref: 'AWS::Region'}, ".amazonaws.com/${self:custom.stage}/DVSA-PAYMENT-PROCESSOR"]]}
+      SQS_URL: {'Fn::Join': ["", ['https://sqs.', {Ref: 'AWS::Region'}, '.amazonaws.com/', {Ref: 'AWS::AccountId'}, '/dvsa-order-paid-sqs']]}
+    timeout: 30
+    memorySize: 128
+    package: 
+      include: 
+        - backend/src/functions/order/order_billing.py
+  CancelOrder:
+    name: DVSA-ORDER-CANCEL
+    handler: backend/src/functions/order/cancel_order.lambda_handler
+    role: dvsaOrderRole
+    environment:
+      ORDERS_TABLE: DVSA-ORDERS-DB
+    timeout: 10
+    memorySize: 128
+    package: 
+      include: 
+        - backend/src/functions/order/cancel_order.py
+  GetOrder:
+    name: DVSA-ORDER-GET
+    handler: backend/src/functions/order/get_order.lambda_handler
+    role: dvsaOrderRole
+    environment:
+      ORDERS_TABLE: DVSA-ORDERS-DB
+    timeout: 10
+    memorySize: 128
+    package: 
+      include: 
+        - backend/src/functions/order/get_order.py
+  OrderNew:
+    name: DVSA-ORDER-NEW
+    handler: backend/src/functions/order/new_order.lambda_handler
+    role: dvsaOrderRole
+    environment:
+      ORDERS_TABLE: DVSA-ORDERS-DB
+    timeout: 10
+    memorySize: 128
+    package: 
+      include: 
+        - backend/src/functions/order/new_order.py
+  GetOrders:
+    name: DVSA-ORDER-ORDERS
+    handler: backend/src/functions/order/get_orders.lambda_handler
+    role: dvsaOrderRole
+    environment:
+      ORDERS_TABLE: DVSA-ORDERS-DB
+    timeout: 10
+    memorySize: 128
+    package: 
+      include: 
+        - backend/src/functions/order/get_orders.py
+  OrderUpdate:
+    name: DVSA-ORDER-UPDATE
+    handler: backend/src/functions/order/update_order.lambda_handler
+    role: dvsaOrderRole
+    environment:
+      ORDERS_TABLE: DVSA-ORDERS-DB
+    timeout: 10
+    memorySize: 128
+    package: 
+      include: 
+        - backend/src/functions/order/update_order.py
