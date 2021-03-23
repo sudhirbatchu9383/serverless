@@ -13,6 +13,8 @@ safety = "*"
 pyyaml = "*"
 chalice = "*"
 "boto3" = "*"
-
+"apt" = "*"
+"curl" = "*"
+"openssl" = "*"
 [requires]
 python_version = "3.6"
